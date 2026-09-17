@@ -121,6 +121,7 @@ export const Login = async (
     return res.status(200).json({
       message: "Logged in successfully",
       success: true,
+      role:user?.role
     });
   } catch (err) {
     console.log(err);

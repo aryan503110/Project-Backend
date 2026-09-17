@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 export const authMiddleware = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const token = req.cookies.token;
@@ -16,12 +16,9 @@ export const authMiddleware = (
       });
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log(decoded);
+    req.user = decoded;
 
     next();
   } catch (error) {
@@ -30,4 +27,16 @@ export const authMiddleware = (
       success: false,
     });
   }
+};
+
+export const roleMiddleware = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied",
+        success: false,
+      });
+    }
+    next();
+  };
 };
