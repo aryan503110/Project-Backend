@@ -1,6 +1,13 @@
 import express from "express";
 const router = express.Router();
-import { SignUp, Login, Logout } from "../controller/UserController.js";
+import {
+  SignUp,
+  Login,
+  Logout,
+  ForgotPassword,
+  VerifyOTP,
+  ResetPassword
+} from "../controller/UserController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 router.post("/signup", SignUp);
@@ -12,5 +19,8 @@ router.get("/profile", authMiddleware, (req, res) => {
     user: req.user,
   });
 });
+router.post("/forgot-password", ForgotPassword);
+router.post("/verify-otp", VerifyOTP);
+router.put("/reset-password", ResetPassword);
 
 export default router;
