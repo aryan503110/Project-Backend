@@ -212,7 +212,6 @@ export const ForgotPassword = async (
       otp,
       expiresAt,
     });
-    console.log("Password reset saved!");
 
     await sendEmail(
       email,
