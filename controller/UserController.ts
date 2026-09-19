@@ -6,6 +6,7 @@ import PasswordReset from "../model/PasswordReset.js";
 import type { Request, Response } from "express";
 import { sendEmail } from "../utils/SendMail.js";
 import crypto from "crypto";
+import cloudinary from "../utils/Cloudinary.js";
 
 type Role = "" | "admin" | "salesperson" | "customer";
 
@@ -78,6 +79,14 @@ export const SignUp = async (
       });
     }
 
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+
+      imageUrl = result.secure_url;
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
@@ -85,6 +94,7 @@ export const SignUp = async (
       email,
       password: hashedPassword,
       role,
+      image: imageUrl,
     });
 
     await newUser.save();
