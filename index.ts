@@ -21,5 +21,3 @@ app.use("/admin", AdminRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });
-
-console.log("Server process is still running");

@@ -6,11 +6,12 @@ import {
   Logout,
   ForgotPassword,
   VerifyOTP,
-  ResetPassword
+  ResetPassword,
 } from "../controller/UserController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { upload } from "../middleware/Upload.js";
 
-router.post("/signup", SignUp);
+router.post("/signup", upload.single("image"), SignUp);
 router.post("/login", Login);
 router.get("/logout", Logout);
 router.get("/profile", authMiddleware, (req, res) => {

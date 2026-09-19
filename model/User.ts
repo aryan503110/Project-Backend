@@ -7,6 +7,7 @@ interface User {
   email: string;
   password: string;
   role: Role;
+  image:string
 }
 
 const userSchema = new mongoose.Schema<User>(
@@ -29,6 +30,10 @@ const userSchema = new mongoose.Schema<User>(
     role: {
       type: String,
       required: true,
+    },
+    image: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true },
