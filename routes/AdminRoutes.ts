@@ -5,7 +5,10 @@ import {
   GetSalesPersonById,
   UpdateSalesPersonById,
   CreateCategory,
-  GetAllCategory
+  GetAllCategory,
+  GetCategoryById,
+  UpdateCategoryById,
+  DeleteCategoryById,
 } from "../controller/AdminController.js";
 import {
   authMiddleware,
@@ -13,6 +16,8 @@ import {
 } from "../middleware/authMiddleware.js";
 import { upload } from "../middleware/Upload.js";
 
+
+{/*Salesperson */}
 router.get(
   "/allsalesperson",
   authMiddleware,
@@ -35,12 +40,7 @@ router.put(
   UpdateSalesPersonById,
 );
 
-router.get(
-  "/allcategories",
-  authMiddleware,
-  roleMiddleware("admin"),
-  GetAllCategory,
-);
+{/*Category */}
 
 router.post(
   "/createcategory",
@@ -49,6 +49,34 @@ router.post(
   CreateCategory,
 );
 
+router.get(
+  "/allcategories",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetAllCategory,
+);
+
+router.get(
+  "/getcategorybyid/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetCategoryById,
+);
+
+router.put(
+  "/updatecategory/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  UpdateCategoryById,
+);
+
+router.delete(
+  "/deletecategory/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  DeleteCategoryById,
+);
+
+{/*Product */}
+
 export default router;
-
-

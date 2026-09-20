@@ -13,6 +13,8 @@ interface categoryResponse {
   success: boolean;
 }
 
+{/*Salesperson */}
+
 export const GetAllSalesperson = async (req: Request, res: Response) => {
   try {
     await connectToDB();
@@ -108,28 +110,7 @@ export const UpdateSalesPersonById = async (req: Request, res: Response) => {
   }
 };
 
-export const createCategory = async (req: Request, res: Response) => {
-  try {
-    await connectToDB();
-
-    const salespersons = await User.find({ role: "salesperson" }).select(
-      "-password",
-    );
-
-    return res.status(200).json({
-      message: "All Salesperson fetched",
-      success: true,
-      salespersons: salespersons,
-    });
-  } catch (err) {
-    console.log(err);
-
-    return res.status(500).json({
-      message: "Error fetching user",
-      success: false,
-    });
-  }
-};
+{/*Category */}
 
 export const GetAllCategory = async (req: Request, res: Response) => {
   try {
@@ -186,3 +167,99 @@ export const CreateCategory = async (
     });
   }
 };
+
+export const GetCategoryById = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const { id } = req.params;
+
+    const category = await Category.findOne({
+      _id: id,
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Category fetched",
+      success: true,
+      category: category,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching category",
+      success: false,
+    });
+  }
+};
+
+export const UpdateCategoryById = async (
+  req: Request<{}, {}, categoryData>,
+  res: Response<categoryResponse>,
+) => {
+  try {
+    await connectToDB();
+    const { id } = req.params;
+    const { categoryName } = req.body;
+    const category = await Category.findByIdAndUpdate(
+      { _id: id },
+      {
+        categoryName: categoryName,
+      },
+    );
+    if (!category) {
+      return res.status(400).json({
+        message: "Category does not exists",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Category Updated",
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error updating category",
+      success: false,
+    });
+  }
+};
+
+export const DeleteCategoryById = async (
+  req: Request<{}, {}, categoryData>,
+  res: Response<categoryResponse>,
+) => {
+  try {
+    await connectToDB();
+    const { id } = req.params;
+    const category = await Category.findByIdAndDelete({ _id: id });
+    if (!category) {
+      return res.status(400).json({
+        message: "Category does not exists",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Category Deleted",
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error deleting category",
+      success: false,
+    });
+  }
+};
+
+{/*Product */}
