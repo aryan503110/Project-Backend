@@ -9,6 +9,16 @@ import {
   GetCategoryById,
   UpdateCategoryById,
   DeleteCategoryById,
+  CreateProduct,
+  GetAllProduct,
+  GetProductById,
+  UpdateProductById,
+  DeleteProductById,
+  CreateAdminStock,
+  GetAllAdminStock,
+  DeleteAdminStock,
+  GetAdminStockById,
+  UpdateAdminStockById,
 } from "../controller/AdminController.js";
 import {
   authMiddleware,
@@ -16,8 +26,9 @@ import {
 } from "../middleware/authMiddleware.js";
 import { upload } from "../middleware/Upload.js";
 
-
-{/*Salesperson */}
+{
+  /*Salesperson */
+}
 router.get(
   "/allsalesperson",
   authMiddleware,
@@ -40,7 +51,9 @@ router.put(
   UpdateSalesPersonById,
 );
 
-{/*Category */}
+{
+  /*Category */
+}
 
 router.post(
   "/createcategory",
@@ -77,6 +90,84 @@ router.delete(
   DeleteCategoryById,
 );
 
-{/*Product */}
+{
+  /*Product */
+}
+
+router.get(
+  "/allproducts",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetAllProduct,
+);
+
+router.post(
+  "/createproduct",
+  upload.single("image"),
+  authMiddleware,
+  roleMiddleware("admin"),
+  CreateProduct,
+);
+
+router.get(
+  "/getproductbyid/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetProductById,
+);
+
+router.put(
+  "/upadteproduct/:id",
+  upload.single("image"),
+  authMiddleware,
+  roleMiddleware("admin"),
+  UpdateProductById,
+);
+
+router.delete(
+  "/deleteproduct/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  DeleteProductById,
+);
+
+{
+  /*Admin Stock */
+}
+
+router.post(
+  "/createadminstock",
+  authMiddleware,
+  roleMiddleware("admin"),
+  CreateAdminStock,
+);
+
+router.get(
+  "/alladminstock",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetAllAdminStock,
+);
+
+router.get(
+  "/getadminstockbyid/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetAdminStockById,
+);
+
+router.delete(
+  "/deleteadminstock/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  DeleteAdminStock,
+);
+
+router.put(
+  "/updateadminstock/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  UpdateAdminStockById,
+);
 
 export default router;
