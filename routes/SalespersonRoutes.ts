@@ -5,7 +5,8 @@ import {
   GetAllSalespersonStockRequests,
   CreateSalespersonStockRequests,
   ApproveSalespersonStockRequest,
-  RejectSalespersonStockRequest
+  RejectSalespersonStockRequest,
+  MyStockForSalesperson
 } from "../controller/SalespersonController.js";
 import {
   authMiddleware,
@@ -52,6 +53,13 @@ router.put(
   authMiddleware,
   roleMiddleware("admin"),
   RejectSalespersonStockRequest,
+);
+
+router.get(
+  "/salespersonmystock/:id",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  MyStockForSalesperson,
 );
 
 export default router;
