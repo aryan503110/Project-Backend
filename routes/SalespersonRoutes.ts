@@ -1,0 +1,57 @@
+import express from "express";
+const router = express.Router();
+import { GetAllProduct } from "../controller/AdminController.js";
+import {
+  GetAllSalespersonStockRequests,
+  CreateSalespersonStockRequests,
+  ApproveSalespersonStockRequest,
+  RejectSalespersonStockRequest
+} from "../controller/SalespersonController.js";
+import {
+  authMiddleware,
+  roleMiddleware,
+} from "../middleware/authMiddleware.js";
+
+{
+  /*Products */
+}
+router.get(
+  "/allproducts",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  GetAllProduct,
+);
+
+{
+  /*Stock Requests */
+}
+
+router.get(
+  "/allstockrequests",
+  authMiddleware,
+  roleMiddleware("salesperson","admin"),
+  GetAllSalespersonStockRequests,
+);
+
+router.post(
+  "/createstockrequest",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  CreateSalespersonStockRequests,
+);
+
+router.put(
+  "/approvestockrequest/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  ApproveSalespersonStockRequest,
+);
+
+router.put(
+  "/rejectstockrequest/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  RejectSalespersonStockRequest,
+);
+
+export default router;
