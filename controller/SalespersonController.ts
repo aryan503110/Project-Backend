@@ -1,10 +1,11 @@
 import connectToDB from "../db/db.js";
 import type { Request, Response } from "express";
 import SalespersonStock from "../model/SalespersonStock.js";
+import SalespersonStockRequest from "../model/SalespersonStockRequest.js";
 import AdminStock from "../model/AdminStock.js";
 
 interface SalespersonStockData {
-  stock: number;
+  requestedStock: number;
 }
 
 interface SalespersonStockResponse {
@@ -18,16 +19,25 @@ export const GetAllSalespersonStockRequests = async (
 ) => {
   try {
     await connectToDB();
-    const stockRequests = await SalespersonStock.find().populate("product");
+
+    const { id } = req.params;
+
+    const stockRequests = await SalespersonStockRequest.find({
+      salesperson: id,
+    })
+      .populate("product")
+      .populate("salesperson", "-password");
+
     return res.status(200).json({
-      message: "All Salesperson Stock fetched",
+      message: "Salesperson Stock fetched",
       success: true,
-      stockRequests: stockRequests,
+      stockRequests,
     });
   } catch (err) {
     console.log(err);
+
     return res.status(500).json({
-      message: "Error fetching salesperson stock ",
+      message: "Error fetching salesperson stock",
       success: false,
     });
   }
@@ -42,10 +52,10 @@ export const CreateSalespersonStockRequests = async (
 
     const { salesperson, product, stock } = req.body;
 
-    const newStockRequest = new SalespersonStock({
+    const newStockRequest = new SalespersonStockRequest({
       salesperson,
       product,
-      stock,
+      requestedStock: stock,
     });
 
     await newStockRequest.save();
@@ -73,7 +83,7 @@ export const ApproveSalespersonStockRequest = async (
 
     const { id } = req.params;
 
-    const stockRequest = await SalespersonStock.findById(id);
+    const stockRequest = await SalespersonStockRequest.findById(id);
 
     if (!stockRequest) {
       return res.status(404).json({
@@ -100,17 +110,39 @@ export const ApproveSalespersonStockRequest = async (
       });
     }
 
-    if (adminStock.stock < stockRequest.stock) {
+    if (adminStock.stock < stockRequest.requestedStock) {
       return res.status(400).json({
         message: "Not enough admin stock",
         success: false,
       });
     }
 
-    adminStock.stock -= stockRequest.stock;
+    // Remove stock from admin
+    adminStock.stock -= stockRequest.requestedStock;
 
     await adminStock.save();
 
+    // Find salesperson's existing stock for this product
+    let salespersonStock = await SalespersonStock.findOne({
+      salesperson: stockRequest.salesperson,
+      product: stockRequest.product,
+    });
+
+    if (salespersonStock) {
+      // Existing product → increase stock
+      salespersonStock.stock += stockRequest.requestedStock;
+    } else {
+      // First time receiving this product
+      salespersonStock = new SalespersonStock({
+        salesperson: stockRequest.salesperson,
+        product: stockRequest.product,
+        stock: stockRequest.requestedStock,
+      });
+    }
+
+    await salespersonStock.save();
+
+    // Mark request as approved
     stockRequest.status = "approved";
 
     await stockRequest.save();
@@ -138,7 +170,7 @@ export const RejectSalespersonStockRequest = async (
 
     const { id } = req.params;
 
-    const stockRequest = await SalespersonStock.findById(id);
+    const stockRequest = await SalespersonStockRequest.findById(id);
 
     if (!stockRequest) {
       return res.status(404).json({
@@ -172,28 +204,48 @@ export const RejectSalespersonStockRequest = async (
   }
 };
 
+{/*My Stock Salesperson */}
+
 export const MyStockForSalesperson = async (req: Request, res: Response) => {
   try {
     await connectToDB();
 
     const { id } = req.params;
 
-    const stockRequest = await SalespersonStock.find({
+    const stock = await SalespersonStock.find({
       salesperson: id,
-      status: "approved",
-    }).populate("product");
-
-    if (!stockRequest || stockRequest.length === 0) {
-      return res.status(404).json({
-        message: "Stock not found for user",
-        success: false,
-      });
-    }
+    }).populate("product").populate("salesperson","-password");
 
     return res.status(200).json({
       message: "My stock fetched successfully",
       success: true,
-      stockRequest: stockRequest,
+      stock,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching stock",
+      success: false,
+    });
+  }
+};
+
+
+export const MyStockForSalespersonById = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const { id } = req.params;
+
+    const stock = await SalespersonStock.findById({
+      _id: id,
+    }).populate("product").populate("salesperson","-password");
+
+    return res.status(200).json({
+      message: "My stock fetched successfully",
+      success: true,
+      stock,
     });
   } catch (err) {
     console.log(err);
