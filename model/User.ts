@@ -7,14 +7,10 @@ interface User {
   email: string;
   password: string;
   role: Role;
-<<<<<<< HEAD
-  image:string
-=======
   image: string;
   isPremium: boolean;
   premiumStartDate?: Date;
   premiumExpiryDate?: Date;
->>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
 }
 
 const userSchema = new mongoose.Schema<User>(
@@ -42,8 +38,6 @@ const userSchema = new mongoose.Schema<User>(
       type: String,
       default: "",
     },
-<<<<<<< HEAD
-=======
     isPremium: {
       type: Boolean,
       default: false,
@@ -55,7 +49,6 @@ const userSchema = new mongoose.Schema<User>(
     premiumExpiryDate: {
       type: Date,
     },
->>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
   },
   { timestamps: true },
 );

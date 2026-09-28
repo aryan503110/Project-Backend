@@ -7,10 +7,7 @@ import type { Request, Response } from "express";
 import { sendEmail } from "../utils/SendMail.js";
 import crypto from "crypto";
 import cloudinary from "../utils/Cloudinary.js";
-<<<<<<< HEAD
-=======
 import stripe from "../utils/stripe.js";
->>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
 
 type Role = "" | "admin" | "salesperson" | "customer";
 
@@ -154,13 +151,9 @@ export const Login = async (
       {
         email: user.email,
         role: user.role,
-<<<<<<< HEAD
-       userId: user._id,
-=======
         userId: user._id,
         name: user.name,
         image: user.image,
->>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
       },
       process.env.JWT_SECRET!,
       {
@@ -369,8 +362,6 @@ export const ResetPassword = async (
     });
   }
 };
-<<<<<<< HEAD
-=======
 
 export const CreatePremiumCheckoutSession = async (
   req: Request,
@@ -464,4 +455,3 @@ export const ActivatePremium = async (req: Request, res: Response) => {
     });
   }
 };
->>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
