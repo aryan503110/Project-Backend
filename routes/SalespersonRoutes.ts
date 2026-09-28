@@ -7,7 +7,9 @@ import {
   ApproveSalespersonStockRequest,
   RejectSalespersonStockRequest,
   MyStockForSalesperson,
-  MyStockForSalespersonById
+  MyStockForSalespersonById,
+  UpdateMyStockSalespersonById,
+  GetAllSalespersonStockRequestsById,
 } from "../controller/SalespersonController.js";
 import {
   authMiddleware,
@@ -20,7 +22,7 @@ import {
 router.get(
   "/allproducts",
   authMiddleware,
-  roleMiddleware("salesperson"),
+  roleMiddleware("admin","salesperson"),
   GetAllProduct,
 );
 
@@ -29,10 +31,17 @@ router.get(
 }
 
 router.get(
+  "/allstockrequests",
+  authMiddleware,
+  roleMiddleware("salesperson", "admin"),
+  GetAllSalespersonStockRequests,
+);
+
+router.get(
   "/allstockrequests/:id",
   authMiddleware,
-  roleMiddleware("salesperson","admin"),
-  GetAllSalespersonStockRequests,
+  roleMiddleware("salesperson", "admin"),
+  GetAllSalespersonStockRequestsById,
 );
 
 router.post(
@@ -56,6 +65,10 @@ router.put(
   RejectSalespersonStockRequest,
 );
 
+{
+  /*My Stock Salesperson */
+}
+
 router.get(
   "/salespersonmystock/:id",
   authMiddleware,
@@ -68,6 +81,13 @@ router.get(
   authMiddleware,
   roleMiddleware("salesperson"),
   MyStockForSalespersonById,
+);
+
+router.put(
+  "/updatesalespersonmystockbyid/:id",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  UpdateMyStockSalespersonById,
 );
 
 export default router;

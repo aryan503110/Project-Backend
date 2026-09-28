@@ -20,6 +20,32 @@ export const GetAllSalespersonStockRequests = async (
   try {
     await connectToDB();
 
+    const stockRequests = await SalespersonStockRequest.find()
+      .populate("product")
+      .populate("salesperson", "-password");
+
+    return res.status(200).json({
+      message: "Salesperson Stock fetched",
+      success: true,
+      stockRequests,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching salesperson requested stock",
+      success: false,
+    });
+  }
+};
+
+export const GetAllSalespersonStockRequestsById = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await connectToDB();
+
     const { id } = req.params;
 
     const stockRequests = await SalespersonStockRequest.find({
@@ -204,7 +230,9 @@ export const RejectSalespersonStockRequest = async (
   }
 };
 
-{/*My Stock Salesperson */}
+{
+  /*My Stock Salesperson */
+}
 
 export const MyStockForSalesperson = async (req: Request, res: Response) => {
   try {
@@ -214,7 +242,9 @@ export const MyStockForSalesperson = async (req: Request, res: Response) => {
 
     const stock = await SalespersonStock.find({
       salesperson: id,
-    }).populate("product").populate("salesperson","-password");
+    })
+      .populate("product")
+      .populate("salesperson", "-password");
 
     return res.status(200).json({
       message: "My stock fetched successfully",
@@ -231,8 +261,10 @@ export const MyStockForSalesperson = async (req: Request, res: Response) => {
   }
 };
 
-
-export const MyStockForSalespersonById = async (req: Request, res: Response) => {
+export const MyStockForSalespersonById = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     await connectToDB();
 
@@ -240,7 +272,9 @@ export const MyStockForSalespersonById = async (req: Request, res: Response) => 
 
     const stock = await SalespersonStock.findById({
       _id: id,
-    }).populate("product").populate("salesperson","-password");
+    })
+      .populate("product")
+      .populate("salesperson", "-password");
 
     return res.status(200).json({
       message: "My stock fetched successfully",
@@ -252,6 +286,41 @@ export const MyStockForSalespersonById = async (req: Request, res: Response) => 
 
     return res.status(500).json({
       message: "Error fetching stock",
+      success: false,
+    });
+  }
+};
+
+export const UpdateMyStockSalespersonById = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await connectToDB();
+
+    const { id } = req.params;
+    const { normalSellingPrice, subscriptionSellingPrice } = req.body;
+    const stock = await SalespersonStock.findByIdAndUpdate(id, {
+      normalSellingPrice,
+      subscriptionSellingPrice,
+    });
+
+    if (!stock) {
+      return res.status(404).json({
+        message: "Stock not found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Stock updated",
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error updating stock",
       success: false,
     });
   }
