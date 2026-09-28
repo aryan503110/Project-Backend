@@ -7,6 +7,7 @@ const PORT = process.env.PORT;
 import UserRoutes from "./routes/UserRoute.js";
 import AdminRoutes from "./routes/AdminRoutes.js"
 import SalespersonRoutes from "./routes/SalespersonRoutes.js"
+import CustomerRoutes from "./routes/CustomerRoutes.js"
 
 app.use(express.json());
 app.use(
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use("/user", UserRoutes);
 app.use("/admin", AdminRoutes);
 app.use("/salesperson", SalespersonRoutes);
+app.use("/customer", CustomerRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);

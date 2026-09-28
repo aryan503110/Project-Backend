@@ -7,6 +7,10 @@ import type { Request, Response } from "express";
 import { sendEmail } from "../utils/SendMail.js";
 import crypto from "crypto";
 import cloudinary from "../utils/Cloudinary.js";
+<<<<<<< HEAD
+=======
+import stripe from "../utils/stripe.js";
+>>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
 
 type Role = "" | "admin" | "salesperson" | "customer";
 
@@ -150,7 +154,13 @@ export const Login = async (
       {
         email: user.email,
         role: user.role,
+<<<<<<< HEAD
        userId: user._id,
+=======
+        userId: user._id,
+        name: user.name,
+        image: user.image,
+>>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
       },
       process.env.JWT_SECRET!,
       {
@@ -359,3 +369,99 @@ export const ResetPassword = async (
     });
   }
 };
+<<<<<<< HEAD
+=======
+
+export const CreatePremiumCheckoutSession = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const customerId = req.user.userId;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+
+            product_data: {
+              name: "Premium Membership",
+            },
+
+            unit_amount: 499 * 100,
+          },
+
+          quantity: 1,
+        },
+      ],
+
+      metadata: {
+        customerId: customerId.toString(),
+      },
+
+      success_url:
+        "http://localhost:5173/premium-success?session_id={CHECKOUT_SESSION_ID}",
+
+      cancel_url: "http://localhost:5173/buy-premium",
+    });
+
+    return res.status(200).json({
+      success: true,
+      url: session.url,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error creating premium checkout session",
+      success: false,
+    });
+  }
+};
+
+export const ActivatePremium = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const { sessionId } = req.body;
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    // Make sure payment was successful
+    if (session.payment_status !== "paid") {
+      return res.status(400).json({
+        message: "Premium payment not completed",
+        success: false,
+      });
+    }
+
+    const customerId = req.user.userId;
+
+    const startDate = new Date();
+
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 30);
+
+    await User.findByIdAndUpdate(customerId, {
+      isPremium: true,
+      premiumStartDate: startDate,
+      premiumExpiryDate: expiryDate,
+    });
+
+    return res.status(200).json({
+      message: "Premium activated successfully",
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error activating premium",
+      success: false,
+    });
+  }
+};
+>>>>>>> 4c8e1d750196090a02dbb7b91ce5d12cc0a527e7
