@@ -3,6 +3,9 @@ const router = express.Router();
 import {
   GetAvailableProductsForCustomer,
   ViewProductByIdCustomer,
+  CreateCheckoutSession,
+  CreateOrder,
+  GetMyOrdersByCustomerId,
 } from "../controller/CustomerController.js";
 import {
   authMiddleware,
@@ -25,6 +28,27 @@ router.get(
   authMiddleware,
   roleMiddleware("customer"),
   ViewProductByIdCustomer,
+);
+
+router.post(
+  "/create-checkout-session",
+  authMiddleware,
+  roleMiddleware("customer"),
+  CreateCheckoutSession,
+);
+
+router.post(
+  "/create-order",
+  authMiddleware,
+  roleMiddleware("customer"),
+  CreateOrder,
+);
+
+router.get(
+  "/myorder/:id",
+  authMiddleware,
+  roleMiddleware("customer"),
+  GetMyOrdersByCustomerId,
 );
 
 export default router;

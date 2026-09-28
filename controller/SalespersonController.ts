@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import SalespersonStock from "../model/SalespersonStock.js";
 import SalespersonStockRequest from "../model/SalespersonStockRequest.js";
 import AdminStock from "../model/AdminStock.js";
+import Order from "../model/Order.js";
 
 interface SalespersonStockData {
   requestedStock: number;
@@ -321,6 +322,65 @@ export const UpdateMyStockSalespersonById = async (
 
     return res.status(500).json({
       message: "Error updating stock",
+      success: false,
+    });
+  }
+};
+
+{
+  /*Order Salesperson */
+}
+
+export const GetMyOrdersBySalespersonId = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await connectToDB();
+
+    const salespersonId = req.user.userId;
+
+    const orders = await Order.find({
+      salesperson: salespersonId,
+    })
+      .populate("product")
+      .populate("salesperson", "-password")
+      .populate("customer", "-password");
+
+    return res.status(200).json({
+      message: "My orders fetched successfully",
+      success: true,
+      order: orders,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching my orders",
+      success: false,
+    });
+  }
+};
+
+export const ChangeStatusOrder = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const { orderId, status } = req.body;
+
+    await Order.findByIdAndUpdate(orderId, {
+      orderStatus: status,
+    });
+
+    return res.status(200).json({
+      message: "Order status updated successfully",
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error updating order status",
       success: false,
     });
   }

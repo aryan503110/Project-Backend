@@ -10,6 +10,8 @@ import {
   MyStockForSalespersonById,
   UpdateMyStockSalespersonById,
   GetAllSalespersonStockRequestsById,
+  GetMyOrdersBySalespersonId,
+  ChangeStatusOrder
 } from "../controller/SalespersonController.js";
 import {
   authMiddleware,
@@ -88,6 +90,23 @@ router.put(
   authMiddleware,
   roleMiddleware("salesperson"),
   UpdateMyStockSalespersonById,
+);
+
+{
+  /*Orders */
+}
+router.get(
+  "/ordersbysalesperson/:id",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  GetMyOrdersBySalespersonId,
+);
+
+router.put(
+  "/changeorderstatus",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  ChangeStatusOrder,
 );
 
 export default router;
