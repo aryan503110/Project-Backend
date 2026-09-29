@@ -203,8 +203,32 @@ export const GetMyOrdersByCustomerId = async (req: Request, res: Response) => {
 
     const customerId = req.user.userId;
 
+    const { search, status } = req.query;
+
+    const query: any = {};
+
+    if (status) {
+      query.orderStatus = status;
+    }
+
+    if (search) {
+      const product = await Product.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      });
+
+      const productId = product.map((item) => item._id);
+
+      query.product = {
+        $in: productId,
+      };
+    }
+
     const orders = await Order.find({
       customer: customerId,
+      ...query,
     })
       .populate("product")
       .populate("salesperson", "-password")

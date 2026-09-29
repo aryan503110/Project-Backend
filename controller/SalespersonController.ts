@@ -4,6 +4,7 @@ import SalespersonStock from "../model/SalespersonStock.js";
 import SalespersonStockRequest from "../model/SalespersonStockRequest.js";
 import AdminStock from "../model/AdminStock.js";
 import Order from "../model/Order.js";
+import Product from "../model/Product.js";
 
 interface SalespersonStockData {
   requestedStock: number;
@@ -21,7 +22,30 @@ export const GetAllSalespersonStockRequests = async (
   try {
     await connectToDB();
 
-    const stockRequests = await SalespersonStockRequest.find()
+    const { search, salesperson } = req.query;
+
+    const query: any = {};
+
+    if (salesperson) {
+      query.salesperson = salesperson;
+    }
+
+    if (search) {
+      const product = await Product.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      });
+
+      const productId = product.map((item) => item._id);
+
+      query.product = {
+        $in: productId,
+      };
+    }
+
+    const stockRequests = await SalespersonStockRequest.find(query)
       .populate("product")
       .populate("salesperson", "-password");
 
@@ -49,8 +73,32 @@ export const GetAllSalespersonStockRequestsById = async (
 
     const { id } = req.params;
 
+    const { search, status } = req.query;
+
+    const query: any = {};
+
+    if (status) {
+      query.status = status;
+    }
+
+    if (search) {
+      const product = await Product.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      });
+
+      const productId = product.map((item) => item._id);
+
+      query.product = {
+        $in: productId,
+      };
+    }
+
     const stockRequests = await SalespersonStockRequest.find({
       salesperson: id,
+      ...query,
     })
       .populate("product")
       .populate("salesperson", "-password");
@@ -241,9 +289,26 @@ export const MyStockForSalesperson = async (req: Request, res: Response) => {
 
     const { id } = req.params;
 
-    const stock = await SalespersonStock.find({
-      salesperson: id,
-    })
+    const { search } = req.query;
+
+    const query: any = {};
+
+    if (search) {
+      const product = await Product.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      });
+
+      const productId = product.map((item) => item._id);
+
+      query.product = {
+        $in: productId,
+      };
+    }
+
+    const stock = await SalespersonStock.find({ salesperson: id, ...query })
       .populate("product")
       .populate("salesperson", "-password");
 
@@ -340,8 +405,32 @@ export const GetMyOrdersBySalespersonId = async (
 
     const salespersonId = req.user.userId;
 
+    const { search, status } = req.query;
+
+    const query:any={}
+
+    if(status){
+      query.orderStatus=status
+    }
+
+    if(search){
+      const product=await Product.find({
+        name:{
+          $regex:search,
+          $options:"i"
+        }
+      })
+
+      const productId=product.map((item)=>item._id)
+
+      query.product={
+        $in:productId
+      }
+    }
+
     const orders = await Order.find({
       salesperson: salespersonId,
+      ...query
     })
       .populate("product")
       .populate("salesperson", "-password")

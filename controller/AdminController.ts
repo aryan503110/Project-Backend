@@ -158,14 +158,14 @@ export const GetAllCategory = async (req: Request, res: Response) => {
 
     const query: any = {};
 
-    if(search){
-      query.categoryName={
-        $regex:search,
-        $options:"i"
-      }
+    if (search) {
+      query.categoryName = {
+        $regex: search,
+        $options: "i",
+      };
     }
 
-    const categories = await Category.find(query  );
+    const categories = await Category.find(query);
 
     return res.status(200).json({
       message: "All categories fetched",
@@ -319,7 +319,22 @@ export const GetAllProduct = async (req: Request, res: Response) => {
   try {
     await connectToDB();
 
-    const products = await Product.find().populate("category");
+    const { search, category } = req.query;
+
+    const query: any = {};
+
+    if (search) {
+      query.name = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    if (category) {
+      query.category = category;
+    }
+
+    const products = await Product.find(query).populate("category");
 
     return res.status(200).json({
       message: "All products fetched",
@@ -540,7 +555,26 @@ export const GetAllAdminStock = async (req: Request, res: Response) => {
   try {
     await connectToDB();
 
-    const adminstock = await AdminStock.find().populate("product");
+    const { search } = req.query;
+
+    const query: any = {};
+
+    if (search) {
+      const product = await Product.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      });
+
+      const productId = product.map((item) => item._id);
+
+      query.product = {
+        $in: productId,
+      };
+    }
+
+    const adminstock = await AdminStock.find(query).populate("product");
 
     return res.status(200).json({
       message: "All admin stock fetched",
