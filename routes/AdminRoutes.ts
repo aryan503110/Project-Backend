@@ -65,7 +65,7 @@ router.post(
 router.get(
   "/allcategories",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("admin","customer"),
   GetAllCategory,
 );
 

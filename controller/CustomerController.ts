@@ -2,6 +2,7 @@ import connectToDB from "../db/db.js";
 import type { Request, Response } from "express";
 import stripe from "../utils/stripe.js";
 import Order from "../model/Order.js";
+import Product from "../model/Product.js";
 import SalespersonStock from "../model/SalespersonStock.js";
 
 export const GetAvailableProductsForCustomer = async (
@@ -11,8 +12,28 @@ export const GetAvailableProductsForCustomer = async (
   try {
     await connectToDB();
 
+    const { search, category } = req.query;
+
+    const productQuery: any = {};
+
+    if (search) {
+      productQuery.name = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    if (category) {
+      productQuery.category = category;
+    }
+
+    const products = await Product.find(productQuery);
+
+    const productIds = products?.map((product) => product._id);
+
     const stock = await SalespersonStock.find({
       stock: { $gt: 0 },
+      product: { $in: productIds },
     })
       .populate("product")
       .populate("salesperson", "-password");
@@ -192,7 +213,7 @@ export const GetMyOrdersByCustomerId = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "My orders fetched successfully",
       success: true,
-      order:orders,
+      order: orders,
     });
   } catch (err) {
     console.log(err);

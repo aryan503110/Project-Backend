@@ -44,9 +44,20 @@ export const GetAllSalesperson = async (req: Request, res: Response) => {
   try {
     await connectToDB();
 
-    const salespersons = await User.find({ role: "salesperson" }).select(
-      "-password",
-    );
+    const { search } = req.query;
+
+    const query: any = {
+      role: "salesperson",
+    };
+
+    if (search) {
+      query.name = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    const salespersons = await User.find(query).select("-password");
 
     return res.status(200).json({
       message: "All Salesperson fetched",
@@ -143,7 +154,18 @@ export const GetAllCategory = async (req: Request, res: Response) => {
   try {
     await connectToDB();
 
-    const categories = await Category.find();
+    const { search } = req.query;
+
+    const query: any = {};
+
+    if(search){
+      query.categoryName={
+        $regex:search,
+        $options:"i"
+      }
+    }
+
+    const categories = await Category.find(query  );
 
     return res.status(200).json({
       message: "All categories fetched",
