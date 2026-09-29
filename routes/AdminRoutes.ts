@@ -19,6 +19,10 @@ import {
   DeleteAdminStock,
   GetAdminStockById,
   UpdateAdminStockById,
+  GetAdminDashboard,
+  GetMonthlyRevenue,
+  GetOrderStatus,
+  GetTopSellingProducts
 } from "../controller/AdminController.js";
 import {
   authMiddleware,
@@ -168,6 +172,37 @@ router.put(
   authMiddleware,
   roleMiddleware("admin"),
   UpdateAdminStockById,
+);
+
+{
+  /*Dashboard */
+}
+router.get(
+  "/dashboard",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetAdminDashboard,
+);
+
+router.get(
+  "/dashboard/revenue",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetMonthlyRevenue,
+);
+
+router.get(
+  "/dashboard/order-status",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetOrderStatus,
+);
+
+router.get(
+  "/dashboard/top-products",
+  authMiddleware,
+  roleMiddleware("admin"),
+  GetTopSellingProducts,
 );
 
 export default router;

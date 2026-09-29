@@ -5,6 +5,9 @@ import cloudinary from "../utils/Cloudinary.js";
 import Category from "../model/Category.js";
 import Product from "../model/Product.js";
 import AdminStock from "../model/AdminStock.js";
+import Order from "../model/Order.js";
+import SalespersonStock from "../model/SalespersonStock.js";
+import SalespersonStockRequest from "../model/SalespersonStockRequest.js";
 
 interface categoryData {
   categoryName: string;
@@ -688,6 +691,204 @@ export const UpdateAdminStockById = async (
 
     return res.status(500).json({
       message: "Error updating admin stock",
+      success: false,
+    });
+  }
+};
+
+{
+  /*Admin Dashboard */
+}
+
+export const GetAdminDashboard = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const totalCustomers = await User.countDocuments({
+      role: "customer",
+    });
+
+    const totalSalespersons = await User.countDocuments({
+      role: "salesperson",
+    });
+
+    const totalProducts = await Product.countDocuments();
+
+    const totalOrders = await Order.countDocuments();
+
+    const totalStockRequests = await SalespersonStockRequest.countDocuments();
+
+    const totalAdminStock = await AdminStock.countDocuments();
+
+    const totalRevenue = await Order.aggregate([
+      {
+        $match: {
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$totalAmount",
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Admin dashboard fetched successfully",
+      success: true,
+      dashboard: {
+        totalCustomers,
+        totalSalespersons,
+        totalProducts,
+        totalOrders,
+        totalStockRequests,
+        totalAdminStock,
+        totalRevenue: totalRevenue[0]?.total || 0,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching admin dashboard",
+      success: false,
+    });
+  }
+};
+
+export const GetMonthlyRevenue = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const revenue = await Order.aggregate([
+      {
+        $match: {
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          totalRevenue: {
+            $sum: "$totalAmount",
+          },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Monthly revenue fetched successfully",
+      success: true,
+      revenue,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching monthly revenue",
+      success: false,
+    });
+  }
+};
+
+export const GetOrderStatus = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const orderStatus = await Order.aggregate([
+      {
+        $group: {
+          _id: "$orderStatus",
+          totalOrders: {
+            $sum: 1,
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Order status fetched successfully",
+      success: true,
+      orderStatus,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching order status",
+      success: false,
+    });
+  }
+};
+
+export const GetTopSellingProducts = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const products = await Order.aggregate([
+      {
+        $match: {
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: "$product",
+          totalQuantity: {
+            $sum: "$quantity",
+          },
+        },
+      },
+      {
+        $sort: {
+          totalQuantity: -1,
+        },
+      },
+      {
+        $limit: 5,
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: "$product",
+      },
+      {
+        $project: {
+          _id: 0,
+          productName: "$product.name",
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Top selling products fetched successfully",
+      success: true,
+      products,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching top selling products",
       success: false,
     });
   }
