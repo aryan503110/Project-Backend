@@ -9,6 +9,8 @@ import {
   ResetPassword,
   CreatePremiumCheckoutSession,
   ActivatePremium,
+  GetUserById,
+  UpdateUserById,
 } from "../controller/UserController.js";
 import {
   authMiddleware,
@@ -63,6 +65,19 @@ router.post(
   authMiddleware,
   roleMiddleware("customer"),
   ActivatePremium,
+);
+router.get(
+  "/get-user/:id",
+  authMiddleware,
+  roleMiddleware("customer", "admin", "salesperson"),
+  GetUserById,
+);
+router.put(
+  "/update-user/:id",
+  upload.single("image"),
+  authMiddleware,
+  roleMiddleware("customer", "admin", "salesperson"),
+  UpdateUserById,
 );
 
 export default router;

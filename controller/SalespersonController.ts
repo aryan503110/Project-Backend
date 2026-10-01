@@ -5,6 +5,7 @@ import SalespersonStockRequest from "../model/SalespersonStockRequest.js";
 import AdminStock from "../model/AdminStock.js";
 import Order from "../model/Order.js";
 import Product from "../model/Product.js";
+import mongoose from "mongoose";
 
 interface SalespersonStockData {
   requestedStock: number;
@@ -407,30 +408,30 @@ export const GetMyOrdersBySalespersonId = async (
 
     const { search, status } = req.query;
 
-    const query:any={}
+    const query: any = {};
 
-    if(status){
-      query.orderStatus=status
+    if (status) {
+      query.orderStatus = status;
     }
 
-    if(search){
-      const product=await Product.find({
-        name:{
-          $regex:search,
-          $options:"i"
-        }
-      })
+    if (search) {
+      const product = await Product.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      });
 
-      const productId=product.map((item)=>item._id)
+      const productId = product.map((item) => item._id);
 
-      query.product={
-        $in:productId
-      }
+      query.product = {
+        $in: productId,
+      };
     }
 
     const orders = await Order.find({
       salesperson: salespersonId,
-      ...query
+      ...query,
     })
       .populate("product")
       .populate("salesperson", "-password")
@@ -470,6 +471,248 @@ export const ChangeStatusOrder = async (req: Request, res: Response) => {
 
     return res.status(500).json({
       message: "Error updating order status",
+      success: false,
+    });
+  }
+};
+
+{
+  /*Salesperson dashboard */
+}
+
+export const GetSalespersonDashboard = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+
+    const salespersonId = new mongoose.Types.ObjectId(req.user.userId);
+
+    const totalOrders = await Order.countDocuments({
+      salesperson: salespersonId,
+    });
+
+    const totalProductsSold = await Order.aggregate([
+      {
+        $match: {
+          salesperson: salespersonId,
+          paymentStatus: "paid",
+          orderStatus: "delivered",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$quantity",
+          },
+        },
+      },
+    ]);
+
+    const totalRevenue = await Order.aggregate([
+      {
+        $match: {
+          salesperson: salespersonId,
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$totalAmount",
+          },
+        },
+      },
+    ]);
+
+    const currentStock = await SalespersonStock.aggregate([
+      {
+        $match: {
+          salesperson: salespersonId,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$stock",
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Salesperson dashboard fetched successfully",
+      success: true,
+      dashboard: {
+        totalOrders,
+        totalProductsSold: totalProductsSold[0]?.total || 0,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        currentStock: currentStock[0]?.total || 0,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching salesperson dashboard",
+      success: false,
+    });
+  }
+};
+
+export const GetSalespersonTopProducts = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await connectToDB();
+
+    const salespersonId = new mongoose.Types.ObjectId(req.user.userId);
+
+    const products = await Order.aggregate([
+      {
+        $match: {
+          salesperson: salespersonId,
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: "$product",
+          totalQuantity: {
+            $sum: "$quantity",
+          },
+        },
+      },
+      {
+        $sort: {
+          totalQuantity: -1,
+        },
+      },
+      {
+        $limit: 5,
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: "$product",
+      },
+      {
+        $project: {
+          _id: 0,
+          productName: "$product.name",
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Top selling products fetched successfully",
+      success: true,
+      products,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching top selling products",
+      success: false,
+    });
+  }
+};
+
+export const GetSalespersonOrderStatus = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await connectToDB();
+
+    const salespersonId = new mongoose.Types.ObjectId(req.user.userId);
+
+    const orderStatus = await Order.aggregate([
+      {
+        $match: {
+          salesperson: salespersonId,
+        },
+      },
+      {
+        $group: {
+          _id: "$orderStatus",
+          totalOrders: {
+            $sum: 1,
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Salesperson order status fetched successfully",
+      success: true,
+      orderStatus,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching order status",
+      success: false,
+    });
+  }
+};
+
+export const GetSalespersonMonthlyRevenue = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await connectToDB();
+
+    const salespersonId = new mongoose.Types.ObjectId(req.user.userId);
+
+    const revenue = await Order.aggregate([
+      {
+        $match: {
+          salesperson: salespersonId,
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          totalRevenue: {
+            $sum: "$totalAmount",
+          },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "Salesperson monthly revenue fetched successfully",
+      success: true,
+      revenue,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error fetching monthly revenue",
       success: false,
     });
   }

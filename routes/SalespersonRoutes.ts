@@ -11,7 +11,11 @@ import {
   UpdateMyStockSalespersonById,
   GetAllSalespersonStockRequestsById,
   GetMyOrdersBySalespersonId,
-  ChangeStatusOrder
+  ChangeStatusOrder,
+  GetSalespersonDashboard,
+  GetSalespersonTopProducts,
+  GetSalespersonOrderStatus,
+  GetSalespersonMonthlyRevenue,
 } from "../controller/SalespersonController.js";
 import {
   authMiddleware,
@@ -24,7 +28,7 @@ import {
 router.get(
   "/allproducts",
   authMiddleware,
-  roleMiddleware("admin","salesperson"),
+  roleMiddleware("admin", "salesperson"),
   GetAllProduct,
 );
 
@@ -108,5 +112,38 @@ router.put(
   roleMiddleware("salesperson"),
   ChangeStatusOrder,
 );
+
+{
+  /*Salesperson Dashboard */
+}
+
+router.get(
+  "/dashboard",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  GetSalespersonDashboard,
+);
+
+router.get(
+  "/dashboard/top-products",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  GetSalespersonTopProducts,
+);
+
+router.get(
+  "/dashboard/order-status",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  GetSalespersonOrderStatus,
+);
+
+router.get(
+  "/dashboard/revenue",
+  authMiddleware,
+  roleMiddleware("salesperson"),
+  GetSalespersonMonthlyRevenue,
+);
+
 
 export default router;

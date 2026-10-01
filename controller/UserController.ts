@@ -182,6 +182,78 @@ export const Login = async (
   }
 };
 
+export const GetUserById = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+    const { id } = req.params;
+
+    const user = await User.findById(id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User does not exist",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User retrieved successfully",
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error retrieving user",
+      success: false,
+    });
+  }
+};
+
+export const UpdateUserById = async (req: Request, res: Response) => {
+  try {
+    await connectToDB();
+    const { id } = req.params;
+const { name, password } = req.body || {};
+
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+
+      imageUrl = result.secure_url;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.findByIdAndUpdate(
+      { _id: id },
+      { name, password: hashedPassword, image: imageUrl },
+      { new: true },
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User does not exist",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      message: "Error updating user",
+      success: false,
+    });
+  }
+};
+
 export const Logout = (req: Request, res: Response) => {
   try {
     res.clearCookie("token");
