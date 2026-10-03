@@ -3,7 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 import UserRoutes from "./routes/UserRoute.js";
 import AdminRoutes from "./routes/AdminRoutes.js"
 import SalespersonRoutes from "./routes/SalespersonRoutes.js"

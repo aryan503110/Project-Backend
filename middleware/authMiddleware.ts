@@ -1,6 +1,14 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+declare global {
+  namespace Express {
+    interface Request {
+      user: any;
+    }
+  }
+}
+
 export const authMiddleware = (
   req: Request,
   res: Response,
@@ -16,7 +24,7 @@ export const authMiddleware = (
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
     req.user = decoded;
 

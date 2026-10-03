@@ -1,4 +1,4 @@
-import connectToDB from "../db/db.ts";
+import connectToDB from "../db/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../model/User.js";
@@ -31,6 +31,7 @@ interface LoginData {
 interface LoginResponse {
   message: string;
   success: boolean;
+  role?: string;
 }
 
 interface ForgotPaswordData {
@@ -54,7 +55,7 @@ interface VerifyOTPResponse {
 
 interface ResetPasswordData {
   email: string;
-  newPassword: number;
+ newPassword: string;
 }
 
 interface ResetPassworResponse {
@@ -215,7 +216,7 @@ export const UpdateUserById = async (req: Request, res: Response) => {
   try {
     await connectToDB();
     const { id } = req.params;
-const { name, password } = req.body || {};
+    const { name, password } = req.body || {};
 
     let imageUrl = "";
 
@@ -299,7 +300,7 @@ export const ForgotPassword = async (
     await PasswordReset.create({
       userId: user._id.toString(),
       email,
-      otp,
+      otp: Number(otp),
       expiresAt,
     });
 
@@ -362,7 +363,7 @@ export const VerifyOTP = async (
         email: OTP.email,
         otp: OTP.otp,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET!,
     );
 
     res.cookie("resetToken", resetToken);

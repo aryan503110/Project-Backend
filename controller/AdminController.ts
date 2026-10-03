@@ -1,4 +1,4 @@
-import connectToDB from "../db/db.ts";
+import connectToDB from "../db/db.js";
 import User from "../model/User.js";
 import type { Request, Response } from "express";
 import cloudinary from "../utils/Cloudinary.js";
@@ -30,6 +30,7 @@ interface productResponse {
 }
 
 interface adminStockData {
+  product: string;
   stock: number;
   purchasePrice: number;
 }
@@ -258,7 +259,7 @@ export const UpdateCategoryById = async (
 ) => {
   try {
     await connectToDB();
-    const { id } = req.params;
+    const id = (req.params as any).id;
     const { categoryName } = req.body;
     const category = await Category.findByIdAndUpdate(
       { _id: id },
@@ -292,7 +293,7 @@ export const DeleteCategoryById = async (
 ) => {
   try {
     await connectToDB();
-    const { id } = req.params;
+    const id = (req.params as any).id;
     const category = await Category.findByIdAndDelete({ _id: id });
     if (!category) {
       return res.status(400).json({
@@ -442,7 +443,7 @@ export const UpdateProductById = async (
   try {
     await connectToDB();
 
-    const { id } = req.params;
+    const id = (req.params as any).id;
     const { name, description, categoryId } = req.body;
 
     const updateData: any = {
@@ -488,7 +489,7 @@ export const DeleteProductById = async (
 ) => {
   try {
     await connectToDB();
-    const { id } = req.params;
+    const id = (req.params as any).id;
     const product = await Product.findByIdAndDelete({ _id: id });
     if (!product) {
       return res.status(400).json({
@@ -563,14 +564,14 @@ export const GetAllAdminStock = async (req: Request, res: Response) => {
     const query: any = {};
 
     if (search) {
-      const product = await Product.find({
+      const product = await (Product as any).find({
         name: {
           $regex: search,
           $options: "i",
         },
       });
 
-      const productId = product.map((item) => item._id);
+      const productId = product.map((item: any) => item._id);
 
       query.product = {
         $in: productId,
@@ -656,13 +657,13 @@ export const GetAdminStockById = async (req: Request, res: Response) => {
 };
 
 export const UpdateAdminStockById = async (
-  req: Request<{}, {}, productData>,
-  res: Response<productResponse>,
+  req: Request<{}, {}, adminStockData>,
+  res: Response<adminStockResponse>,
 ) => {
   try {
     await connectToDB();
 
-    const { id } = req.params;
+    const id = (req.params as any).id;
     const { product, stock, purchasePrice } = req.body;
 
     const updateData: any = {

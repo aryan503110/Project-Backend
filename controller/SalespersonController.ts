@@ -8,7 +8,9 @@ import Product from "../model/Product.js";
 import mongoose from "mongoose";
 
 interface SalespersonStockData {
-  requestedStock: number;
+  salesperson: string;
+  product: string;
+  stock: number;
 }
 
 interface SalespersonStockResponse {
@@ -32,14 +34,14 @@ export const GetAllSalespersonStockRequests = async (
     }
 
     if (search) {
-      const product = await Product.find({
+      const product = await (Product as any).find({
         name: {
           $regex: search,
           $options: "i",
         },
       });
 
-      const productId = product.map((item) => item._id);
+      const productId = product.map((item: any) => item._id);
 
       query.product = {
         $in: productId,
@@ -83,14 +85,14 @@ export const GetAllSalespersonStockRequestsById = async (
     }
 
     if (search) {
-      const product = await Product.find({
+      const product = await (Product as any).find({
         name: {
           $regex: search,
           $options: "i",
         },
       });
 
-      const productId = product.map((item) => item._id);
+      const productId = product.map((item: any) => item._id);
 
       query.product = {
         $in: productId,
@@ -175,7 +177,7 @@ export const ApproveSalespersonStockRequest = async (
       });
     }
 
-    const adminStock = await AdminStock.findOne({
+    const adminStock = await (AdminStock as any).findOne({
       product: stockRequest.product,
     });
 
@@ -295,14 +297,14 @@ export const MyStockForSalesperson = async (req: Request, res: Response) => {
     const query: any = {};
 
     if (search) {
-      const product = await Product.find({
+      const product = await (Product as any).find({
         name: {
           $regex: search,
           $options: "i",
         },
       });
 
-      const productId = product.map((item) => item._id);
+      const productId = product.map((item: any) => item._id);
 
       query.product = {
         $in: productId,
@@ -415,14 +417,14 @@ export const GetMyOrdersBySalespersonId = async (
     }
 
     if (search) {
-      const product = await Product.find({
+      const product = await (Product as any).find({
         name: {
           $regex: search,
           $options: "i",
         },
       });
 
-      const productId = product.map((item) => item._id);
+      const productId = product.map((item: any) => item._id);
 
       query.product = {
         $in: productId,

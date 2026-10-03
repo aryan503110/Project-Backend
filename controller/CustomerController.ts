@@ -31,7 +31,7 @@ export const GetAvailableProductsForCustomer = async (
 
     const productIds = products?.map((product) => product._id);
 
-    const stock = await SalespersonStock.find({
+    const stock = await (SalespersonStock as any).find({
       stock: { $gt: 0 },
       product: { $in: productIds },
     })
@@ -154,7 +154,7 @@ export const CreateOrder = async (req: Request, res: Response) => {
       });
     }
 
-    const customerId = session.metadata?.customerId;
+    const customerId = session.metadata?.customerId!;
     const items = JSON.parse(session.metadata?.items || "[]");
 
     for (const item of items) {
@@ -212,14 +212,14 @@ export const GetMyOrdersByCustomerId = async (req: Request, res: Response) => {
     }
 
     if (search) {
-      const product = await Product.find({
+      const product = await (Product as any).find({
         name: {
           $regex: search,
           $options: "i",
         },
       });
 
-      const productId = product.map((item) => item._id);
+      const productId = product.map((item:any) => item._id);
 
       query.product = {
         $in: productId,

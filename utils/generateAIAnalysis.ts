@@ -22,8 +22,7 @@ export const generateAIAnalysis = async () => {
 
   const totalOrders = await Order.countDocuments();
 
-  const totalStockRequests =
-    await SalespersonStockRequest.countDocuments();
+  const totalStockRequests = await SalespersonStockRequest.countDocuments();
 
   const totalAdminStock = await AdminStock.countDocuments();
 
@@ -76,7 +75,7 @@ Keep the response simple and concise.
   });
 
   await AiAnalysis.create({
-    analysis: response.text,
+    analysis: response.text || "",
   });
 
   return response.text;
