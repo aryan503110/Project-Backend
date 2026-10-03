@@ -27,7 +27,8 @@
     "nodemailer": "^10.0.10",
     "nodemon": "^3.1.14",
     "pdfkit": "^0.20.2",
-    "stripe": "^22.6.2"
+    "stripe": "^22.6.2",
+    "typescript": "^7.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -39,7 +40,6 @@
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^8.0.2",
     "@types/pdfkit": "^0.17.6",
-    "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
+    "tsx": "^4.23.13"
   }
 }
