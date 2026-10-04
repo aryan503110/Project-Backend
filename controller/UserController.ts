@@ -55,7 +55,7 @@ interface VerifyOTPResponse {
 
 interface ResetPasswordData {
   email: string;
- newPassword: string;
+  newPassword: string;
 }
 
 interface ResetPassworResponse {
@@ -101,18 +101,22 @@ export const SignUp = async (
 
     await newUser.save();
 
-    await sendEmail(
-      email,
-      "Welcome to Our Application",
-      `Hello ${name}, your account has been successfully created.These are your credentials Email:${email} and Password:${password} and the role assigned is ${role}.`,
-    );
+    try {
+      await sendEmail(
+        email,
+        "Welcome to Our Application",
+        `Hello ${name}, your account has been successfully created. These are your credentials Email:${email} and Password:${password} and the role assigned is ${role}.`,
+      );
+    } catch (emailError) {
+      console.error("EMAIL ERROR:", emailError);
+    }
 
     return res.status(201).json({
       message: "New user created",
       success: true,
     });
   } catch (err) {
-   console.error("SIGNUP ERROR:", err);
+    console.error("SIGNUP ERROR:", err);
 
     return res.status(500).json({
       message: "Error creating user",
