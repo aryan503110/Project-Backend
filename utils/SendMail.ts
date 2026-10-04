@@ -1,4 +1,7 @@
 import nodemailer from "nodemailer";
+import dns from 'dns'
+
+dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -10,11 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = async (
-  to: string,
-  subject: string,
-  text: string
-) => {
+export const sendEmail = async (to: string, subject: string, text: string) => {
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to,
