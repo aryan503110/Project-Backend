@@ -29,7 +29,7 @@ router.delete("/deleteproduct/:id", authMiddleware, roleMiddleware("admin"), Del
     /*Admin Stock */
 }
 router.post("/createadminstock", authMiddleware, roleMiddleware("admin"), CreateAdminStock);
-router.get("/alladminstock", authMiddleware, roleMiddleware("admin"), GetAllAdminStock);
+router.get("/alladminstock", authMiddleware, roleMiddleware("admin","salesperson"), GetAllAdminStock);
 router.get("/getadminstockbyid/:id", authMiddleware, roleMiddleware("admin"), GetAdminStockById);
 router.delete("/deleteadminstock/:id", authMiddleware, roleMiddleware("admin"), DeleteAdminStock);
 router.put("/updateadminstock/:id", authMiddleware, roleMiddleware("admin"), UpdateAdminStockById);
