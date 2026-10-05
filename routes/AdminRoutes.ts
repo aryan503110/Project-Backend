@@ -156,7 +156,7 @@ router.get(
 router.get(
   "/getadminstockbyid/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("admin","salesperson"),
   GetAdminStockById,
 );
 

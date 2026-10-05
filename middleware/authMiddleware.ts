@@ -25,8 +25,6 @@ export const authMiddleware = (
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    console.log("DECODED USER:", decoded);
-    console.log("USER ROLE:", decoded.role);
 
     req.user = decoded;
 
@@ -41,8 +39,6 @@ export const authMiddleware = (
 
 export const roleMiddleware = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    console.log("ROLE FROM REQUEST:", req.user.role);
-    console.log("ALLOWED ROLES:", roles);
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         message: "Access denied",

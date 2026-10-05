@@ -1,1 +1,0 @@
-{"version":3,"file":"SalespersonStockRequest.d.ts","sourceRoot":"","sources":["../../model/SalespersonStockRequest.ts"],"names":[],"mappings":"AAAA,OAAO,QAAQ,MAAM,UAAU,CAAC;AAEhC,UAAU,2BAA2B;IACnC,WAAW,EAAE,QAAQ,CAAC,MAAM,CAAC,KAAK,CAAC,QAAQ,CAAC;IAC5C,OAAO,EAAE,QAAQ,CAAC,MAAM,CAAC,KAAK,CAAC,QAAQ,CAAC;IACxC,cAAc,EAAE,MAAM,CAAC;IACvB,MAAM,EAAE,MAAM,CAAC;CAChB"}
