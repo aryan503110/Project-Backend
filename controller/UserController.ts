@@ -102,7 +102,7 @@ export const SignUp = async (
     await newUser.save();
 
     try {
-       await sendEmail(
+      await sendEmail(
         email,
         "Welcome to Our Application",
         `Hello ${name}, your account has been successfully created. These are your credentials Email:${email} and Password:${password} and the role assigned is ${role}.`,
@@ -374,7 +374,11 @@ export const VerifyOTP = async (
       process.env.JWT_SECRET!,
     );
 
-    res.cookie("resetToken", resetToken);
+    res.cookie("resetToken", resetToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return res.status(200).json({
       message: "OTP verified successfully",
@@ -478,8 +482,7 @@ export const CreatePremiumCheckoutSession = async (
         customerId: customerId.toString(),
       },
 
-      success_url:
-        `${process.env.FRONTEND_URL}/premium-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.FRONTEND_URL}/premium-success?session_id={CHECKOUT_SESSION_ID}`,
 
       cancel_url: `${process.env.FRONTEND_URL}/buy-premium`,
     });
