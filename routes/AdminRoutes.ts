@@ -149,14 +149,14 @@ router.post(
 router.get(
   "/alladminstock",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("admin","salesperson"),
   GetAllAdminStock,
 );
 
 router.get(
   "/getadminstockbyid/:id",
   authMiddleware,
-  roleMiddleware("admin","salesperson"),
+  roleMiddleware("admin"),
   GetAdminStockById,
 );
 
