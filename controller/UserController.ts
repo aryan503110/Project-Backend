@@ -102,7 +102,7 @@ export const SignUp = async (
     await newUser.save();
 
     try {
-      await sendEmail(
+       sendEmail(
         email,
         "Welcome to Our Application",
         `Hello ${name}, your account has been successfully created. These are your credentials Email:${email} and Password:${password} and the role assigned is ${role}.`,
@@ -312,7 +312,7 @@ export const ForgotPassword = async (
       expiresAt,
     });
 
-    await sendEmail(
+    sendEmail(
       email,
       "Reset Password Mail",
       `Hello ${user.name}, your OTP is ${otp}`,
