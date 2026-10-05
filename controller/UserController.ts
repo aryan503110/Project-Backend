@@ -81,6 +81,17 @@ export const SignUp = async (
       });
     }
 
+    if (role === "admin") {
+      const existingAdmin = await User.findOne({ role: "admin" });
+
+      if (existingAdmin) {
+        return res.status(400).json({
+          message: "Admin already exists",
+          success: false,
+        });
+      }
+    }
+
     let imageUrl = "";
 
     if (req.file) {
