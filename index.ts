@@ -5,17 +5,17 @@ import cookieParser from "cookie-parser";
 const app = express();
 const PORT = process.env.PORT || 3000;
 import UserRoutes from "./routes/UserRoute.js";
-import AdminRoutes from "./routes/AdminRoutes.js"
-import SalespersonRoutes from "./routes/SalespersonRoutes.js"
-import CustomerRoutes from "./routes/CustomerRoutes.js"
-import InvoiceRoutes from "./routes/InvoiceRoutes.js"
+import AdminRoutes from "./routes/AdminRoutes.js";
+import SalespersonRoutes from "./routes/SalespersonRoutes.js";
+import CustomerRoutes from "./routes/CustomerRoutes.js";
+import InvoiceRoutes from "./routes/InvoiceRoutes.js";
 import geminiRoutes from "./routes/GeminiRoutes.js";
 import "./utils/cron.js";
 
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   }),
 );

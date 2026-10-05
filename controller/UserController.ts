@@ -479,9 +479,9 @@ export const CreatePremiumCheckoutSession = async (
       },
 
       success_url:
-        "http://localhost:5173/premium-success?session_id={CHECKOUT_SESSION_ID}",
+        `${process.env.FRONTEND_URL}/premium-success?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: "http://localhost:5173/buy-premium",
+      cancel_url: `${process.env.FRONTEND_URL}/buy-premium`,
     });
 
     return res.status(200).json({

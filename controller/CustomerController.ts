@@ -122,9 +122,9 @@ export const CreateCheckoutSession = async (req: Request, res: Response) => {
       },
 
       success_url:
-        "http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}",
+        `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: "http://localhost:5173/cart",
+      cancel_url: `${process.env.FRONTEND_URL}/cart`,
     });
 
     return res.status(200).json({
