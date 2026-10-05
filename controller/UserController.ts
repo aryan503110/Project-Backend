@@ -261,7 +261,11 @@ export const UpdateUserById = async (req: Request, res: Response) => {
 
 export const Logout = (req: Request, res: Response) => {
   try {
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return res.status(200).json({
       message: "Logged Out Successfully",
