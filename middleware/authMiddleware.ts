@@ -26,6 +26,7 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     console.log("DECODED USER:", decoded);
+    console.log("USER ROLE:", decoded.role);
 
     req.user = decoded;
 
