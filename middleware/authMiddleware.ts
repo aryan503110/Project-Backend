@@ -41,6 +41,8 @@ export const authMiddleware = (
 
 export const roleMiddleware = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
+    console.log("ROLE FROM REQUEST:", req.user.role);
+    console.log("ALLOWED ROLES:", roles);
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         message: "Access denied",
