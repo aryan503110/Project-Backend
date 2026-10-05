@@ -36,10 +36,12 @@ export const sendEmail = async (
   subject: string,
   text: string,
 ) => {
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: "onboarding@resend.dev",
     to,
     subject,
     text,
   });
+
+  console.log("RESEND RESULT:", result);
 };
