@@ -3,6 +3,10 @@ import dns from 'dns'
 
 dns.setDefaultResultOrder("ipv4first");
 
+dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
+  console.log("SMTP DNS:", err || addresses);
+});
+
 const transporter = nodemailer.createTransport({
   // host: process.env.SMTP_HOST,
     host: "smtp.gmail.com",
