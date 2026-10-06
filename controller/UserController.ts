@@ -230,23 +230,29 @@ export const GetUserById = async (req: Request, res: Response) => {
 export const UpdateUserById = async (req: Request, res: Response) => {
   try {
     await connectToDB();
+
     const { id } = req.params;
     const { name, password } = req.body || {};
 
-    let imageUrl = "";
+    const updateData: any = {};
+
+    if (name) {
+      updateData.name = name;
+    }
+
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
 
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
-
-      imageUrl = result.secure_url;
+      updateData.image = result.secure_url;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.findByIdAndUpdate(
-      { _id: id },
-      { name, password: hashedPassword, image: imageUrl },
-      { new: true },
+      id,
+      updateData,
+      { new: true }
     );
 
     if (!user) {
@@ -259,6 +265,7 @@ export const UpdateUserById = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "User updated successfully",
       success: true,
+      user,
     });
   } catch (err) {
     console.log(err);
