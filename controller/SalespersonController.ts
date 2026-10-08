@@ -368,10 +368,12 @@ export const UpdateMyStockSalespersonById = async (
     await connectToDB();
 
     const { id } = req.params;
-    const { normalSellingPrice, subscriptionSellingPrice } = req.body;
+    const { normalSellingPrice, subscriptionSellingPrice, onlyPremium } =
+      req.body;
     const stock = await SalespersonStock.findByIdAndUpdate(id, {
       normalSellingPrice,
       subscriptionSellingPrice,
+      premiumOnly: onlyPremium,
     });
 
     if (!stock) {

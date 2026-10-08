@@ -6,6 +6,7 @@ interface SalespersonStockData {
   stock: number;
   normalSellingPrice?: number;
   subscriptionSellingPrice?: number;
+  premiumOnly:boolean;
 }
 
 const salespersonStockSchema =
@@ -36,6 +37,11 @@ const salespersonStockSchema =
     subscriptionSellingPrice: {
       type: Number,
       min: 0,
+    },
+
+    premiumOnly: {
+      type: Boolean,
+      default:false
     },
   });
 

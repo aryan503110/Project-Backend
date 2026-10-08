@@ -22,6 +22,10 @@ interface productData {
   name: string;
   description: string;
   categoryId: string;
+  cocoaPercentage: number;
+  weight: number;
+  weightType: string;
+  flavors: string[];
 }
 
 interface productResponse {
@@ -362,7 +366,15 @@ export const CreateProduct = async (
   try {
     await connectToDB();
 
-    const { name, description, categoryId } = req.body;
+    const {
+      name,
+      description,
+      categoryId,
+      cocoaPercentage,
+      weight,
+      weightType,
+      flavors,
+    } = req.body;
 
     const product = await Product.findOne({ name });
 
@@ -377,8 +389,23 @@ export const CreateProduct = async (
 
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path);
-
       imageUrl = result.secure_url;
+    }
+
+    let parsedFlavors: string[] = [];
+
+    if (flavors) {
+      try {
+        parsedFlavors =
+          typeof flavors === "string"
+            ? JSON.parse(flavors)
+            : flavors;
+      } catch (error) {
+        return res.status(400).json({
+          message: "Invalid flavors format",
+          success: false,
+        });
+      }
     }
 
     const newProduct = new Product({
@@ -386,6 +413,10 @@ export const CreateProduct = async (
       description,
       category: categoryId,
       image: imageUrl,
+      cocoaPercentage,
+      weight,
+      weightType,
+      flavors: parsedFlavors,
     });
 
     await newProduct.save();
