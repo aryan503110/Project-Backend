@@ -28,7 +28,7 @@ import {
 router.get(
   "/allproducts",
   authMiddleware,
-  roleMiddleware("admin", "salesperson"),
+  roleMiddleware("admin", "salesperson","customer"),
   GetAllProduct,
 );
 

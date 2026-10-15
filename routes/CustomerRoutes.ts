@@ -6,6 +6,9 @@ import {
   CreateCheckoutSession,
   CreateOrder,
   GetMyOrdersByCustomerId,
+  CreateBasketCheckoutSession,
+  CreateCustomBasket,
+  GetBasketOrdersByCustomerId
 } from "../controller/CustomerController.js";
 import {
   authMiddleware,
@@ -49,6 +52,31 @@ router.get(
   authMiddleware,
   roleMiddleware("customer"),
   GetMyOrdersByCustomerId,
+);
+
+{
+  /*Custom Basket */
+}
+
+router.post(
+  "/createbasketcheckout",
+  authMiddleware,
+  roleMiddleware("customer"),
+  CreateBasketCheckoutSession,
+);
+
+router.post(
+  "/createbasket",
+  authMiddleware,
+  roleMiddleware("customer"),
+  CreateCustomBasket,
+);
+
+router.get(
+  "/getbaskets/:id",
+  authMiddleware,
+  roleMiddleware("customer"),
+  GetBasketOrdersByCustomerId,
 );
 
 export default router;
