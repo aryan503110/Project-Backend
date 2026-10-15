@@ -18,11 +18,16 @@ import {
 } from "../middleware/authMiddleware.js";
 import { upload } from "../middleware/Upload.js";
 import User from "../model/User.js";
+import {
+  loginLimiter,
+  generalLimiter,
+  passwordLimiter,
+} from "../utils/RateLimiter.js";
 
-router.post("/signup", upload.single("image"), SignUp);
-router.post("/login", Login);
+router.post("/signup", generalLimiter, upload.single("image"), SignUp);
+router.post("/login", loginLimiter, Login);
 router.get("/logout", Logout);
-router.get("/profile", authMiddleware, async (req, res) => {
+router.get("/profile", generalLimiter, authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select("-password");
 
@@ -51,29 +56,33 @@ router.get("/profile", authMiddleware, async (req, res) => {
     });
   }
 });
-router.post("/forgot-password", ForgotPassword);
-router.post("/verify-otp", VerifyOTP);
-router.put("/reset-password", ResetPassword);
+router.post("/forgot-password", passwordLimiter, ForgotPassword);
+router.post("/verify-otp", passwordLimiter, VerifyOTP);
+router.put("/reset-password", passwordLimiter, ResetPassword);
 router.post(
   "/create-premium-checkout",
+  generalLimiter,
   authMiddleware,
   roleMiddleware("customer"),
   CreatePremiumCheckoutSession,
 );
 router.post(
   "/activate-premium",
+  generalLimiter,
   authMiddleware,
   roleMiddleware("customer"),
   ActivatePremium,
 );
 router.get(
   "/get-user/:id",
+  generalLimiter,
   authMiddleware,
   roleMiddleware("customer", "admin", "salesperson"),
   GetUserById,
 );
 router.put(
   "/update-user/:id",
+  generalLimiter,
   upload.single("image"),
   authMiddleware,
   roleMiddleware("customer", "admin", "salesperson"),
